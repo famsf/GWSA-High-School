@@ -1,0 +1,19 @@
+/**var xobj;
+		if (window.XMLHttpRequest) {
+		    xobj=new XMLHttpRequest();
+		} else if (window.ActiveXObject) {
+		    xobjx=new ActiveXObject("Microsoft.XMLHTTP");
+		}
+	   if (xobj == null) {
+	        alert("Your browser does not support XMLHTTP.");
+	    }
+		xobj.overrideMimeType("application/json");
+		xobj.open('GET', "images/data.txt", true);
+		xobj.onreadystatechange = function () {
+		    if (xobj.readyState == 4 && xobj.status == "200") {
+		        // Required use of an anonymous callback as .open will NOT return a value but simply returns undefined in asynchronous mode
+		        jsonObject = JSON.parse(xobj.responseText);
+		        allImageDetails = jsonObject.split("\n");
+		    }
+		};
+		xobj.send(null);**/

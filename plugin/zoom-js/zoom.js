@@ -3,23 +3,31 @@
 	var isEnabled = true;
 
 	document.querySelector( '.reveal .slides' ).addEventListener( 'mousedown', function( event ) {
-		var modifier = ( Reveal.getConfig().zoomKey ? Reveal.getConfig().zoomKey : 'alt' ) + 'Key';
+		//var modifier = ( Reveal.getConfig().zoomKey ? Reveal.getConfig().zoomKey : 'alt' ) + 'Key';
 
-		var zoomPadding = 20;
+		var zoomPadding = 10;
 		var revealScale = Reveal.getScale();
 
-		if( event[ modifier ] && isEnabled ) {
-			event.preventDefault();
+		event.preventDefault();
 
-			var bounds = event.target.getBoundingClientRect();
+		var bounds = event.target.getBoundingClientRect();
+		$('.image_container-header').toggle();
 
-			zoom.to({
-				x: ( bounds.left * revealScale ) - zoomPadding,
-				y: ( bounds.top * revealScale ) - zoomPadding,
-				width: ( bounds.width * revealScale ) + ( zoomPadding * 2 ),
-				height: ( bounds.height * revealScale ) + ( zoomPadding * 2 ),
-				pan: false
-			});
+		zoom.to({
+			x:  ( bounds.left * revealScale ) - zoomPadding,//1024 - zoomPadding,
+			y: ( bounds.top * revealScale ) - zoomPadding,//724 - zoomPadding, 
+			width: ( bounds.width * revealScale ) + ( zoomPadding * 2 ), //1024 + zoomPadding*2, 
+			height: ( bounds.height * revealScale ) + ( zoomPadding * 2 ),//724 + zoomPadding*2,//
+			pan: false, 
+			scale: revealScale + .25
+		});
+
+
+		if (zoom.zoomLevel() == 1){
+			$('.fa-minus-circle').hide();
+			$('.image_container-header').show();
+		} else {
+			$('.fa-minus-circle').show();
 		}
 	} );
 
@@ -67,6 +75,7 @@ var zoom = (function(){
 	document.addEventListener( 'keyup', function( event ) {
 		if( level !== 1 && event.keyCode === 27 ) {
 			zoom.out();
+			$('image_container-header').show();
 		}
 	} );
 
@@ -145,7 +154,7 @@ var zoom = (function(){
 			}
 		}
 
-		level = scale;
+		level += scale;
 
 		if( document.documentElement.classList ) {
 			if( level !== 1 ) {
@@ -208,8 +217,9 @@ var zoom = (function(){
 
 			// Due to an implementation limitation we can't zoom in
 			// to another element without zooming out first
-			if( level !== 1 ) {
+			if( level === 2 ) {
 				zoom.out();
+				$('image_container-header').show();
 			}
 			else {
 				options.x = options.x || 0;
@@ -233,6 +243,7 @@ var zoom = (function(){
 				}
 
 				if( options.scale > 1 ) {
+					//level += scale;
 					options.x *= options.scale;
 					options.y *= options.scale;
 
@@ -273,6 +284,5 @@ var zoom = (function(){
 	}
 
 })();
-
 
 
