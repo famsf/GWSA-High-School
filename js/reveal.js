@@ -109,7 +109,7 @@ function zoomImg(e){
 		$(last.id).animate({
 			"background-size": "100%"
 		}, 900);	
-		document.getElementById(id).style.backgroundPosition = "center";
+		document.getElementById(id).style.backgroundPosition = "50% 50%";
 		zoomLevel = 1;
 	}
 	if (zoomLevel == 1){
