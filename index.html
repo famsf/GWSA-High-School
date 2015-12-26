@@ -29,8 +29,16 @@
 			document.getElementsByTagName( 'head' )[0].appendChild( link );
 		</script>
 		
-		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
-		
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+		<style type="text/css">
+		    #warning-message { display: none; }
+		    @media only screen and (orientation:portrait){
+		        #warning-message { display:block; }
+		    }
+		    @media only screen and (orientation:landscape){
+		        #warning-message { display:none; }
+		    }
+		</style>
 		<!--[if lt IE 9]>
 		<script src="lib/js/html5shiv.js"></script>
 		<![endif]-->
@@ -39,16 +47,16 @@
 	<body>
 		<div class="reveal noselect">
 			<div class="zoom-icon">
-					<i class="fa fa-plus-circle fa-4x fa-stack-1x" onclick="zoomIn"></i>
-			</div>
-			<div class="zoom-icon">
-				<i class="fa fa-minus-circle fa-4x fa-stack-1x"></i>
-			</div>
+					<i class="fa fa-plus-circle fa-4x fa-stack-1x" onclick="zoomIn()"></i>
+				
+					<i class="fa fa-minus-circle fa-4x fa-stack-1x" onclick="zoomOut()"></i>
+				</div>
 			<!-- Any section element inside of this container is displayed as a slide -->
 			<div class="slides">
-				<section data-background="images/1.jpg">
-					<h1><u>GET SMART WITH ART <br> (9th-12th grades)</u></h1>
-					<h3>Site in Sight: How Location Shapes Perspectives</h3>
+				
+			<section data-background="images/6.jpg">
+					<h1><u>GET SMART WITH ART </u></h1>
+					<h2>Site in Sight: How Location Shapes Perspectives<br>(9th-12th grades)</h2>
 				</section>
 
 			</div>
@@ -69,16 +77,14 @@
 
 				// Optional reveal.js plugins
 				dependencies: [
-					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
-					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
 					{ src: 'plugin/zoom-js/zoom.js', async: true },
 					{ src: 'plugin/notes/notes.js', async: true }
 				]
 			});
-
 		</script>
 
 	</body>
+	<div id="warning-message">
+	    This website is best viewed in landscape mode. 
+	</div>
 </html>

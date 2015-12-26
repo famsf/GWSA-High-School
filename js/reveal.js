@@ -8,29 +8,124 @@
 
  function zoomIn(){
 	zoom.to({
-		x: 0, 
-		y: 0, 
-		width: 1024, 
-		height: 724,
+		x: $(window).width() / 2, 
+		y: $(window).height() / 2, 
 		pan: false, 
-		scale: 0.25
+		scale: 1.25
 	});
-
-	if (zoom.zoomLevel() == 2){
-		$('.fa-plus-circle').hide();
-	}
-
+	$('.zoom-icon').animate({
+		top: "10%",
+		right: "13%"
+	}, 300);
+	$('.fa-minus-circle').show();
 }
 
-function dropDown(){
+function zoomOut(){
+	zoom.out();
+	$('.zoom-icon').animate({
+		top: "20px",
+		right: "10%"
+	}, 300);
+}
+
+var zoomLevel = 1;
+var last = "";
+function zoomImg(e){
+	var parentPosition = getPosition(e.currentTarget);
+    var xPosition = e.clientX;
+    var yPosition = e.clientY;
+
+	var zoomPadding = 10;
+	var revealScale = Reveal.getScale();
+
+	event.preventDefault();
+	
+	if (last != e.id){
+		zoomLevel = 1;
+	}
+	
+	zoomLevel += .25;
+	zoom.to({
+		x:  xPosition,
+		y: yPosition,
+		pan: false, 
+		scale : zoomLevel
+	});
+
+	console.log(zoomLevel);
+	last = e.id;
+
+	$('.image_container-header').toggle();
+
+	if (zoom.zoomLevel() == 1){
+		$('.fa-minus-circle').hide();
+		$('.image_container-header').show();
+	} else {
+		$('.fa-minus-circle').show();
+	}
+
+	if (zoomLevel == 2){
+		zoomLevel = 1;
+	}
+
+	Reveal.addEventListener( 'overviewshown', function() { isEnabled = false; } );
+	Reveal.addEventListener( 'overviewhidden', function() { isEnabled = true; } );
+}
+
+function getPosition(element) {
+    var xPosition = 0;
+    var yPosition = 0;
+      
+    while (element) {
+        xPosition += (element.offsetLeft - element.scrollLeft + element.clientLeft);
+        yPosition += (element.offsetTop - element.scrollTop + element.clientTop);
+        element = element.offsetParent;
+    }
+    return { x: xPosition, y: yPosition };
+}
+
+function dropDown(id){
 	$(".object_info").slideToggle();
 	$(".zoom-icon").slideToggle();
-	if ($(".image_container-body").hasClass('shift_right')){
-		$(".image_container-body").removeClass('shift_right');
+	$(".controls").slideToggle();
+	if ($(".image_container-body").hasClass('shifted')){
+		$(".image_container-body").removeClass('shifted');
+		rescale(id, "maximize");
 	} else {
-		$(".image_container-body").addClass('shift_right');
-		$(".image_container-header").show();
+		$(".image_container-body").addClass('shifted');
+		rescale(id, "minimize");
 	}
+}
+
+var imgwidth, imgheight;
+function rescale(id, rescale){
+	var img = document.getElementById(id);
+	var width = img.clientWidth, height = img.clientHeight;
+	var amt = width, scale = 1;
+	if (rescale == "minimize"){
+		imgheight = height; imgwidth = width;
+		if (width > 724){
+			amt = 724;
+		}
+		scale = amt/width;
+		/**img.width = width * scale;
+		img.height = height * scale;**/
+		
+		$("#" + id).animate({
+			width : String(width*scale),
+			image : String(height*scale)
+		}, 500);
+		img.align = "right";
+	} else {
+		if (imgwidth > 0 && imgheight > 0 ){
+			$("#" + id).animate({
+			width : imgwidth,
+			image : imgheight
+		}, 500);
+			img.align = "center";
+			imgheight = 0; imgwidth = 0;
+		}
+	}	
 }
 
 (function( root, factory ) {
@@ -64,10 +159,10 @@ function dropDown(){
 			// The "normal" size of the presentation, aspect ratio will be preserved
 			// when the presentation is scaled to fit different resolutions
 			width: 1024,
-			height: 600,
+			height: 768,
 
 			// Factor of the display size that should remain empty around the content
-			margin: 0.1,
+			margin: 0,
 
 			// Bounds for smallest/largest possible scale to apply to content
 			minScale: 1,
@@ -177,7 +272,7 @@ function dropDown(){
 		},
 
 		//Text file that holds all of the image details
-		allImageDetails = ["Diego Rivera (1886–1957); Two Women and a Child;1926;Oil on canvas;29 3/8 x 31 5/8 in. (74.6 x 80.3 cm);FAMSF, Gift of Albert M. Bender, 1926.122", 'Albert Bierstadt (1830–1902);California Spring;1875;Oil on canvas;54 1/4 x 84 1/4 in. (137.8 x 214 cm);FAMSF, Presented to the City and County of San Francisco by Gordon Blanding, 1941.6', 'Elihu Vedder (1836–1923);The Sphinx of the Seashore, 1879;Oil on canvas;16 x 27 7/8 in. (40.6 x 70.8 cm);FAMSF, Gift of Mr. and Mrs. John D. Rockefeller 3rd, 1979.7.102', 'Horace Pippin (1888–1946);The Trial of John Brown;1942;Oil on canvas;16 1/2 x 20 1/8 in. (41.9 x 51.1 cm);FAMSF, Gift of Mr. and Mrs. John D. Rockefeller 3rd, 1979.7.82', 'Zhan Wang (b. 1962);Artificial Rock;2005; Stainless steel;177 1/8 x 78 3/4 x 94 1/2 in. (449.9 x 200 x 240 cm);FAMSF, Foundation purchase, a gift from Dagmar Dolby in celebration of Ray Dolby\'s 1965 founding of Dolby Laboratories, 2005.61','Wayne Thiebaud (b. 1920); Diagonal Freeway;1993;Acrylic on canvas;36 x 60 in. (91.4 x 152.4 cm);Art C Wayne Thiebaud/Licensed by VAGA, New York, NY. (FAMSF, Partial gift of Morgan Flagg in memory of his son, Lawrence J. Flagg, 1998.186', 'Grant Wood (1891–1942);Dinner for Threshers;1934;Oil on hardboard panel;20 x 80 in. (50.8 x 203.2 cm);Gift of Mr. and Mrs. John D. Rockefeller 3rd, 1979.7.105', 'John Langley Howard (1902–1999);Embarcadero and Clay Street;1935; Oil on canvas;35 7/8 x 43 1/2 in. (91.1 x 110.5 cm);FAMSF Museum purchase, Dr. Leland A. Barber and Gladys K. Barber Fund, 2002.96', 'Stuart Davis (1892–1964);Night Life;1962;Oil on canvas;24 x 32 in. (61 x 81.3 cm);FAMSF, Gift of Mrs. Paul L. Wattis and bequest of the Phyllis C. Wattis 1991 Trust from Paul L. Wattis Jr. and Carol W. Casey, 1996.75 ', 'Ruth Asawa (1926–2013);Installation of various works in the de Young’s Hamon Education Tower', 'Andy Goldsworthy (b. 1956);Drawn Stone;2005;Appleton Greenmore sandstone;1 5/8 x 124 1/8 x 179 3/4 ft. (.48 x 37.82 x 54.78 m);FAMSF, Museum purchase, gift of Lonna and Marshall Wais, 2004.5', 'Kiki Smith (b. 1954);Near;2005;Cast aluminum, copper leaf, and hand-blown glass;13 1/4 x 41 x 24 ft. (3.96 x 12.49 x 7.32 m);FAMSF, Museum purchase, gift of Dorothy and George Saxe and Friends of New Art, 2004.94'],
+		allImageDetails = ["Diego Rivera (1886–1957); Two Women and a Child;1926;Oil on canvas;29 3/8 x 31 5/8 in. (74.6 x 80.3 cm);FAMSF, Gift of Albert M. Bender, 1926.122", 'Albert Bierstadt (1830–1902);California Spring;1875;Oil on canvas;54 1/4 x 84 1/4 in. (137.8 x 214 cm);FAMSF, Presented to the City and County of San Francisco by Gordon Blanding, 1941.6', 'Elihu Vedder (1836–1923);The Sphinx of the Seashore, 1879;Oil on canvas;16 x 27 7/8 in. (40.6 x 70.8 cm);FAMSF, Gift of Mr. and Mrs. John D. Rockefeller 3rd, 1979.7.102', 'Horace Pippin (1888–1946);The Trial of John Brown;1942;Oil on canvas;16 1/2 x 20 1/8 in. (41.9 x 51.1 cm);FAMSF, Gift of Mr. and Mrs. John D. Rockefeller 3rd, 1979.7.82', 'Zhan Wang (b. 1962);Artificial Rock;2005; Stainless steel;177 1/8 x 78 3/4 x 94 1/2 in. (449.9 x 200 x 240 cm);FAMSF, Foundation purchase, a gift from Dagmar Dolby in celebration of Ray Dolby\'s 1965 founding of Dolby Laboratories, 2005.61','Wayne Thiebaud (b. 1920); Diagonal Freeway;1993;Acrylic on canvas;36 x 60 in. (91.4 x 152.4 cm);Art C Wayne Thiebaud/Licensed by VAGA, New York, NY. (FAMSF, Partial gift of Morgan Flagg in memory of his son, Lawrence J. Flagg, 1998.186', 'Grant Wood (1891–1942);Dinner for Threshers;1934;Oil on hardboard panel;20 x 80 in. (50.8 x 203.2 cm);Gift of Mr. and Mrs. John D. Rockefeller 3rd, 1979.7.105', 'John Langley Howard (1902–1999);Embarcadero and Clay Street;1935; Oil on canvas;35 7/8 x 43 1/2 in. (91.1 x 110.5 cm);FAMSF Museum purchase, Dr. Leland A. Barber and Gladys K. Barber Fund, 2002.96', 'Stuart Davis (1892–1964);Night Life;1962;Oil on canvas;24 x 32 in. (61 x 81.3 cm);FAMSF, Gift of Mrs. Paul L. Wattis and bequest of the Phyllis C. Wattis 1991 Trust from Paul L. Wattis Jr. and Carol W. Casey, 1996.75 ', 'Andy Goldsworthy (b. 1956);Drawn Stone;2005;Appleton Greenmore sandstone;1 5/8 x 124 1/8 x 179 3/4 ft. (.48 x 37.82 x 54.78 m);FAMSF, Museum purchase, gift of Lonna and Marshall Wais, 2004.5', 'Kiki Smith (b. 1954);Near;2005;Cast aluminum, copper leaf, and hand-blown glass;13 1/4 x 41 x 24 ft. (3.96 x 12.49 x 7.32 m);FAMSF, Museum purchase, gift of Dorothy and George Saxe and Friends of New Art, 2004.94', 'Ruth Asawa (1926–2013);Installation of various works in the de Young’s Hamon Education Tower'],
 		
 		// Total number of slides
 		numberOfSlides = 13, 
@@ -322,7 +417,11 @@ function dropDown(){
 
 		// Loads the dependencies and continues to #start() once done
 		load();
-
+		var i;
+		for (i = 1; i < totalSlides(); i++){
+			var imgid = "img" + i;
+			document.getElementById(imgid).addEventListener("click", zoomImg);
+		}
 	}
 
 	/**
@@ -1680,29 +1779,24 @@ function dropDown(){
 
 	}
 
+	function totalSlides(){
+		return numberOfSlides;
+	}
+
 	function loadSlide(slideNumber, slideElement) {
-
-	// Create an image element
-
 		slideElement.setAttribute('id', slideNumber);
-		var div = document.createElement( 'div' );
-		div.classList.add("image_container-body");
-		var img = document.createElement( 'img' );
-		img.setAttribute('background-image', 'images/' +  slideNumber + '.jpg');
-		div.innerHTML = img;
-
+		
 		var headers = allImageDetails[slideNumber-1].split(";");
-
+		var imgid = '\'img' + slideNumber +'\'';
 		slideElement.innerHTML = [
 		'<div class="image_container-header">', 
-			'<div class="details-button" type="button" onclick="dropDown();">',
+			'<div class="details-button" type="button" onclick="dropDown('+imgid+');">',
 				'<i class="fa fa-bars">Details</i>', 
 			'</div>', 
 				'<span class="object_header">',
 				headers[0] + ' | ' + headers[1], 
 				'</span>', 
-				'<div class="object_info">',
-					'<h3>More Details</h3>', 
+				'<div class="object_info">More Details', 
 					'<div class="info-name"> Date Created: </div>', 
 					'<div class="info-value">' + headers[2] + '</div>', 
 					'<div class="info-name">', 
@@ -1717,11 +1811,9 @@ function dropDown(){
 			'</div>',
 		'</div>', 
 		'<div class="image_container-body" align="center">', 
-			'<img src=\'images/'+slideNumber+
-			'\.jpg\'>', 
+			'<img id='+imgid+' src=\'images/'+slideNumber+'\.jpg\' align="center">', 
 		'</div>'
 		].join('');
-
 	}
 
 	/**
@@ -2157,6 +2249,19 @@ function dropDown(){
 
 	}
 
+	function resetSlide(index){
+		if ($(".image_container-body").hasClass('shifted')){
+			$(".image_container-body").removeClass('shifted');
+			$(".object_info").hide();
+			$(".zoom-icon").show();
+			rescale("img" + String(index - 1), "maximize");
+			var img = document.getElementById("img" + String(index));
+			imgwidth = img.clientWidth;
+			imgheight = img.clientHeight;
+			console.log(imgwidth);
+		} 
+	}
+
 	/**
 	 * Steps from the current point in the presentation to the
 	 * slide which matches the specified horizontal and vertical
@@ -2169,7 +2274,7 @@ function dropDown(){
 	 * @param {int} o Optional origin for use in multimaster environments
 	 */
 	function slide( h, v, f, o ) {
-
+		resetSlide(h);
 		// Remember where we were at before
 		previousSlide = currentSlide;
 
@@ -3529,7 +3634,6 @@ function dropDown(){
 	 * 2) Previous horizontal slide
 	 */
 	function navigatePrev() {
-		$('.object_info').hide();
 
 		if( availableRoutes().up ) {
 			navigateUp();
@@ -3557,8 +3661,6 @@ function dropDown(){
 	 * The reverse of #navigatePrev().
 	 */
 	function navigateNext() {
-		$('.object_info').hide();
-
 		if( availableRoutes().down ) {
 			navigateDown();
 		}

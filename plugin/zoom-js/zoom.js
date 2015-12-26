@@ -1,39 +1,5 @@
 // Custom reveal.js integration
-(function(){
-	var isEnabled = true;
 
-	document.querySelector( '.reveal .slides' ).addEventListener( 'mousedown', function( event ) {
-		//var modifier = ( Reveal.getConfig().zoomKey ? Reveal.getConfig().zoomKey : 'alt' ) + 'Key';
-
-		var zoomPadding = 10;
-		var revealScale = Reveal.getScale();
-
-		event.preventDefault();
-
-		var bounds = event.target.getBoundingClientRect();
-		$('.image_container-header').toggle();
-
-		zoom.to({
-			x:  ( bounds.left * revealScale ) - zoomPadding,//1024 - zoomPadding,
-			y: ( bounds.top * revealScale ) - zoomPadding,//724 - zoomPadding, 
-			width: ( bounds.width * revealScale ) + ( zoomPadding * 2 ), //1024 + zoomPadding*2, 
-			height: ( bounds.height * revealScale ) + ( zoomPadding * 2 ),//724 + zoomPadding*2,//
-			pan: false, 
-			scale: revealScale + .25
-		});
-
-
-		if (zoom.zoomLevel() == 1){
-			$('.fa-minus-circle').hide();
-			$('.image_container-header').show();
-		} else {
-			$('.fa-minus-circle').show();
-		}
-	} );
-
-	Reveal.addEventListener( 'overviewshown', function() { isEnabled = false; } );
-	Reveal.addEventListener( 'overviewhidden', function() { isEnabled = true; } );
-})();
 
 /*!
  * zoom.js 0.3 (modified for use with reveal.js)
@@ -154,7 +120,7 @@ var zoom = (function(){
 			}
 		}
 
-		level += scale;
+		level = scale;
 
 		if( document.documentElement.classList ) {
 			if( level !== 1 ) {
