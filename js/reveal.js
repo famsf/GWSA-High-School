@@ -5,72 +5,155 @@
  *
  * Copyright (C) 2015 Hakim El Hattab, http://hakim.se
  */
-
- function zoomIn(){
-	zoom.to({
-		x: $(window).width() / 2, 
-		y: $(window).height() / 2, 
-		pan: false, 
-		scale: 1.25
-	});
-	$('.zoom-icon').animate({
-		top: "10%",
-		right: "13%"
-	}, 300);
-	$('.fa-minus-circle').show();
-}
-
-function zoomOut(){
-	zoom.out();
-	$('.zoom-icon').animate({
-		top: "20px",
-		right: "10%"
-	}, 300);
-}
-
 var zoomLevel = 1;
-var last = "";
+var last = {id:"", width:0, height:0};
+function zoomIn(e){
+	var slideNum = Reveal.getIndices(Reveal.getCurrentSlide()).h;
+	var id = "img" + slideNum;
+	var width, height;
+	zoomLevel += .25;
+	resetImgContain(id);
+
+	$(last.id).animate({
+		"background-size": zoomLevel*100 + "%"
+	}, 900);
+		
+	if (zoomLevel == 2){
+		$('.fa-plus-circle').hide();
+	}
+	$('.fa-minus-circle').show();
+	$('.image_container-header').hide();
+	$('.object_footer').hide();
+	
+}
+
+function zoomOut(e){
+	var i = Reveal.getIndices(Reveal.getCurrentSlide()).h;
+	var id = "img" + i;
+	var sizes = resetImgContain(id);
+	zoomLevel -= .25;
+	if (zoomLevel == 1){
+		$(last.id).animate({
+			"background-size": "100%"
+		}, 900);
+		document.getElementById(id).style.backgroundPosition = "center";
+		$('.object_footer').show();
+		$('.fa-minus-circle').hide();
+		$('.image_container-header').show();
+	} else {
+		$(last.id).animate({
+			"background-size": zoomLevel*100 + "%"
+		}, 900);
+	}
+	$('.fa-plus-circle').show();
+}
+
+function getRealSize(id){
+	var img = new Image;
+	img.src = "images/"+id + ".jpg";
+	var imgW = img.width;
+	var imgH = img.height;
+	var scale;
+	if(Math.abs(1024 - imgW) > Math.abs(768 - imgH)){
+	    return 1024;
+	} else{
+	    scale = 768/imgH;
+	    return imgW*scale;     
+	}
+}
+
+function resetImgContain(id){
+	if (last.id != "#" + id){
+		last.id = "#" + id;
+		last.width = getRealSize(id[3]);
+	} 
+}
+
+function getClicked(e){
+	var totalOffsetX = 0;
+    var totalOffsetY = 0;
+    var canvasX = 0;
+    var canvasY = 0;
+    var currentElement = this;
+
+    do{
+        totalOffsetX += currentElement.offsetLeft - currentElement.scrollLeft;
+        totalOffsetY += currentElement.offsetTop - currentElement.scrollTop;
+    }
+    while(currentElement = currentElement.offsetParent)
+
+    canvasX = event.pageX - totalOffsetX;
+    canvasY = event.pageY - totalOffsetY;
+
+    return {x:canvasX, y:canvasY}
+}
+
 function zoomImg(e){
-	var parentPosition = getPosition(e.currentTarget);
+	var id = e.target.id;
+	var img = document.getElementById(id);
+	var width, height;
+	var parentPosition = getPosition(e.target);
     var xPosition = e.clientX;
     var yPosition = e.clientY;
-
-	var zoomPadding = 10;
-	var revealScale = Reveal.getScale();
-
-	event.preventDefault();
-	
-	if (last != e.id){
+   		
+	resetImgContain(id);
+	zoomLevel += .25;
+	if (zoomLevel < 2){
+		var bounds = e.target.getBoundingClientRect();
+		$(last.id).animate({
+			"backgroundPositionX": bounds.left*zoomLevel - 20,
+			"backgroundPositionY": bounds.top* zoomLevel - 20,
+			"background-size": zoomLevel*100 + "%"
+		}, 900);	
+	} else {
+		$(last.id).animate({
+			"background-size": "100%"
+		}, 900);	
+		document.getElementById(id).style.backgroundPosition = "center";
 		zoomLevel = 1;
 	}
-	
-	zoomLevel += .25;
-	zoom.to({
-		x:  xPosition,
-		y: yPosition,
-		pan: false, 
-		scale : zoomLevel
-	});
-
-	console.log(zoomLevel);
-	last = e.id;
-
-	$('.image_container-header').toggle();
-
-	if (zoom.zoomLevel() == 1){
+	if (zoomLevel == 1){
+		$('.fa-plus-circle').show();
 		$('.fa-minus-circle').hide();
 		$('.image_container-header').show();
 	} else {
 		$('.fa-minus-circle').show();
+		$('.image_container-header').hide();
 	}
-
 	if (zoomLevel == 2){
-		zoomLevel = 1;
+		$('.fa-plus-circle').hide();
 	}
-
 	Reveal.addEventListener( 'overviewshown', function() { isEnabled = false; } );
 	Reveal.addEventListener( 'overviewhidden', function() { isEnabled = true; } );
 }
+
+function dragImg(e){
+	if (zoomLevel == 1){
+		return;
+	}
+	e.style.position = 'absolute'
+	document.onmousemove = function(E) {
+		E = E || event;
+		fixPageXY(E);
+		self.style.left = E.pageX-25+'px';
+		self.style.top = E.pageY-25+'px'
+	}
+	this.onmouseup = function() {
+		document.onmousemove = null;
+	}
+}
+
+function fixPageXY(e) {
+	if (e.pageX == null && e.clientX != null ) {
+		var html = document.documentElement;
+		var body = document.body;
+		e.pageX = e.clientX + (html.scrollLeft || body && body.scrollLeft || 0)
+		e.pageX -= html.clientLeft || 0;
+		e.pageY = e.clientY + (html.scrollTop || body && body.scrollTop || 0);
+		e.pageY -= html.clientTop || 0;
+	}
+}
+
 
 function getPosition(element) {
     var xPosition = 0;
@@ -85,46 +168,49 @@ function getPosition(element) {
 }
 
 function dropDown(id){
-	$(".object_info").slideToggle();
-	$(".zoom-icon").slideToggle();
-	$(".controls").slideToggle();
 	if ($(".image_container-body").hasClass('shifted')){
 		$(".image_container-body").removeClass('shifted');
 		rescale(id, "maximize");
 	} else {
+		if (zoomLevel > 1){
+			document.getElementById(id).style.backgroundSize = "100%";
+			zoomLevel = 1;
+		}
 		$(".image_container-body").addClass('shifted');
 		rescale(id, "minimize");
 	}
+	$('.object_footer').toggle();
+	$(".zoom-icon").slideToggle();
+	$(".controls").slideToggle();
+	$(".object_info").slideToggle(650);
+	$('.details-button').toggleClass('clicked');
 }
 
-var imgwidth, imgheight;
 function rescale(id, rescale){
-	var img = document.getElementById(id);
-	var width = img.clientWidth, height = img.clientHeight;
-	var amt = width, scale = 1;
+	resetImgContain(id);
+	var amt = last.width, scale = 1;
 	if (rescale == "minimize"){
-		imgheight = height; imgwidth = width;
-		if (width > 724){
-			amt = 724;
+		if (id == "img1"){
+			amt = 903;
+		} else if (last.width > 744 && id != "img5"){
+			amt = 735;
 		}
-		scale = amt/width;
-		/**img.width = width * scale;
-		img.height = height * scale;**/
-		
-		$("#" + id).animate({
-			width : String(width*scale),
-			image : String(height*scale)
-		}, 500);
-		img.align = "right";
+		scale = amt/last.width;
+		$(last.id).animate({
+			"background-size": scale*100 + "%",
+		}, 600);
+		if (id == "img1"){
+			document.getElementById(id).style.backgroundPositionX = "205px";
+		} else if (id == "img5"){
+			document.getElementById(id).style.backgroundPositionX = "68px";
+		} else {
+			document.getElementById(id).style.backgroundPosition = "center right";
+		}
 	} else {
-		if (imgwidth > 0 && imgheight > 0 ){
-			$("#" + id).animate({
-			width : imgwidth,
-			image : imgheight
-		}, 500);
-			img.align = "center";
-			imgheight = 0; imgwidth = 0;
-		}
+		$(last.id).animate({
+			"background-size": "100%"
+		}, 600);
+		document.getElementById(id).style.backgroundPosition = "center";
 	}	
 }
 
@@ -272,7 +358,8 @@ function rescale(id, rescale){
 		},
 
 		//Text file that holds all of the image details
-		allImageDetails = ["Diego Rivera (1886–1957); Two Women and a Child;1926;Oil on canvas;29 3/8 x 31 5/8 in. (74.6 x 80.3 cm);FAMSF, Gift of Albert M. Bender, 1926.122", 'Albert Bierstadt (1830–1902);California Spring;1875;Oil on canvas;54 1/4 x 84 1/4 in. (137.8 x 214 cm);FAMSF, Presented to the City and County of San Francisco by Gordon Blanding, 1941.6', 'Elihu Vedder (1836–1923);The Sphinx of the Seashore, 1879;Oil on canvas;16 x 27 7/8 in. (40.6 x 70.8 cm);FAMSF, Gift of Mr. and Mrs. John D. Rockefeller 3rd, 1979.7.102', 'Horace Pippin (1888–1946);The Trial of John Brown;1942;Oil on canvas;16 1/2 x 20 1/8 in. (41.9 x 51.1 cm);FAMSF, Gift of Mr. and Mrs. John D. Rockefeller 3rd, 1979.7.82', 'Zhan Wang (b. 1962);Artificial Rock;2005; Stainless steel;177 1/8 x 78 3/4 x 94 1/2 in. (449.9 x 200 x 240 cm);FAMSF, Foundation purchase, a gift from Dagmar Dolby in celebration of Ray Dolby\'s 1965 founding of Dolby Laboratories, 2005.61','Wayne Thiebaud (b. 1920); Diagonal Freeway;1993;Acrylic on canvas;36 x 60 in. (91.4 x 152.4 cm);Art C Wayne Thiebaud/Licensed by VAGA, New York, NY. (FAMSF, Partial gift of Morgan Flagg in memory of his son, Lawrence J. Flagg, 1998.186', 'Grant Wood (1891–1942);Dinner for Threshers;1934;Oil on hardboard panel;20 x 80 in. (50.8 x 203.2 cm);Gift of Mr. and Mrs. John D. Rockefeller 3rd, 1979.7.105', 'John Langley Howard (1902–1999);Embarcadero and Clay Street;1935; Oil on canvas;35 7/8 x 43 1/2 in. (91.1 x 110.5 cm);FAMSF Museum purchase, Dr. Leland A. Barber and Gladys K. Barber Fund, 2002.96', 'Stuart Davis (1892–1964);Night Life;1962;Oil on canvas;24 x 32 in. (61 x 81.3 cm);FAMSF, Gift of Mrs. Paul L. Wattis and bequest of the Phyllis C. Wattis 1991 Trust from Paul L. Wattis Jr. and Carol W. Casey, 1996.75 ', 'Andy Goldsworthy (b. 1956);Drawn Stone;2005;Appleton Greenmore sandstone;1 5/8 x 124 1/8 x 179 3/4 ft. (.48 x 37.82 x 54.78 m);FAMSF, Museum purchase, gift of Lonna and Marshall Wais, 2004.5', 'Kiki Smith (b. 1954);Near;2005;Cast aluminum, copper leaf, and hand-blown glass;13 1/4 x 41 x 24 ft. (3.96 x 12.49 x 7.32 m);FAMSF, Museum purchase, gift of Dorothy and George Saxe and Friends of New Art, 2004.94', 'Ruth Asawa (1926–2013);Installation of various works in the de Young’s Hamon Education Tower'],
+		allImageDetails = ["Diego Rivera (1886–1957); Two Women and a Child;1926;Oil on canvas;29 3/8 x 31 5/8 in. (74.6 x 80.3 cm);FAMSF, Gift of Albert M. Bender, 1926.122",
+		 'Albert Bierstadt (1830–1902);California Spring;1875;Oil on canvas;54 1/4 x 84 1/4 in. (137.8 x 214 cm);FAMSF, Presented to the City and County of San Francisco by Gordon Blanding, 1941.6', 'Elihu Vedder (1836–1923);The Sphinx of the Seashore;1879;Oil on canvas;16 x 27 7/8 in. (40.6 x 70.8 cm);FAMSF, Gift of Mr. and Mrs. John D. Rockefeller 3rd, 1979.7.102', 'Horace Pippin (1888–1946);The Trial of John Brown;1942;Oil on canvas;16 1/2 x 20 1/8 in. (41.9 x 51.1 cm);FAMSF, Gift of Mr. and Mrs. John D. Rockefeller 3rd, 1979.7.82', 'Zhan Wang (b. 1962);Artificial Rock;2005; Stainless steel;177 1/8 x 78 3/4 x 94 1/2 in. (449.9 x 200 x 240 cm);FAMSF, Foundation purchase, a gift from Dagmar Dolby in celebration of Ray Dolby\'s 1965 founding of Dolby Laboratories, 2005.61','Wayne Thiebaud (b. 1920); Diagonal Freeway;1993;Acrylic on canvas;36 x 60 in. (91.4 x 152.4 cm);Art C Wayne Thiebaud/Licensed by VAGA, New York, NY. (FAMSF, Partial gift of Morgan Flagg in memory of his son, Lawrence J. Flagg, 1998.186', 'Grant Wood (1891–1942);Dinner for Threshers;1934;Oil on hardboard panel;20 x 80 in. (50.8 x 203.2 cm);Gift of Mr. and Mrs. John D. Rockefeller 3rd, 1979.7.105', 'John Langley Howard (1902–1999);Embarcadero and Clay Street;1935; Oil on canvas;35 7/8 x 43 1/2 in. (91.1 x 110.5 cm);FAMSF Museum purchase, Dr. Leland A. Barber and Gladys K. Barber Fund, 2002.96', 'Stuart Davis (1892–1964);Night Life;1962;Oil on canvas;24 x 32 in. (61 x 81.3 cm);FAMSF, Gift of Mrs. Paul L. Wattis and bequest of the Phyllis C. Wattis 1991 Trust from Paul L. Wattis Jr. and Carol W. Casey, 1996.75 ', 'Andy Goldsworthy (b. 1956);Drawn Stone;2005;Appleton Greenmore sandstone;1 5/8 x 124 1/8 x 179 3/4 ft. (.48 x 37.82 x 54.78 m);FAMSF, Museum purchase, gift of Lonna and Marshall Wais, 2004.5', 'Kiki Smith (b. 1954);Near;2005;Cast aluminum, copper leaf, and hand-blown glass;13 1/4 x 41 x 24 ft. (3.96 x 12.49 x 7.32 m);FAMSF, Museum purchase, gift of Dorothy and George Saxe and Friends of New Art, 2004.94', 'Ruth Asawa (1926–2013);Installation of various works in the de Young’s Hamon Education Tower'],
 		
 		// Total number of slides
 		numberOfSlides = 13, 
@@ -417,11 +504,16 @@ function rescale(id, rescale){
 
 		// Loads the dependencies and continues to #start() once done
 		load();
+
 		var i;
+		var images = document.getElementsByClassName('image_container-body');
 		for (i = 1; i < totalSlides(); i++){
 			var imgid = "img" + i;
 			document.getElementById(imgid).addEventListener("click", zoomImg);
+			document.getElementById(imgid).addEventListener("onmousedown", dragImg);
 		}
+		document.getElementById("zoomin").addEventListener("click", zoomIn);
+		document.getElementById("zoomout").addEventListener("click", zoomOut);
 	}
 
 	/**
@@ -522,15 +614,10 @@ function rescale(id, rescale){
 	}
 
 	function setupSlides(){
-		for( var i = 0, len = numberOfSlides; i < len; i++ ) {
-			var slide;
-			if (i > 0){
-				slide = document.createElement('section');
-				loadSlide(i, slide);
-			}
-			if (i > 0){
-				dom.slides.appendChild(slide);
-			}
+		for( var i = 1, len = numberOfSlides; i < len; i++ ) {
+			var slide = document.createElement('section');
+			loadSlide(i, slide);
+			dom.slides.appendChild(slide);
 		}
 	}
 
@@ -1104,7 +1191,7 @@ function rescale(id, rescale){
 		sync();
 
 	}
-
+	
 	/**
 	 * Binds all event listeners.
 	 */
@@ -1788,34 +1875,40 @@ function rescale(id, rescale){
 		
 		var headers = allImageDetails[slideNumber-1].split(";");
 		var imgid = '\'img' + slideNumber +'\'';
+
 		slideElement.innerHTML = [
 		'<div class="image_container-header">', 
-			'<div class="details-button" type="button" onclick="dropDown('+imgid+');">',
-				'<i class="fa fa-bars">Details</i>', 
+			'<div class="details-button" type="button" onclick="dropDown('+imgid+')">',
+				'<i class="fa fa-bars"></i> Details', 
 			'</div>', 
-				'<span class="object_header">',
-				headers[0] + ' | ' + headers[1], 
-				'</span>', 
-				'<div class="object_info">More Details', 
-					'<div class="info-name"> Date Created: </div>', 
-					'<div class="info-value">' + headers[2] + '</div>', 
-					'<div class="info-name">', 
-					'Physical Dimensions:', 
-					'</div>', 
-					'<div class="info-value">' + headers[3] + '</div>', 
-					'<div class="info-name">Medium:</div>', 
-					'<div class="info-value">' + headers[4] + '</div>', 
-					'<div class="info-name">Rights:</div>', 
-					'<div class="info-value">' + headers[5] + '</div>', 
-				'</div>', 
+			
+			'<div class="object_info">',
+				'<div class="details_header"><b>More Details</b></div>', 
+				'<div class="info-name" style="border-top: none"> Title: </div>', 
+				'<div class="info-value">' + headers[1] + '</div>',
+				'<div class="info-name"> Artist: </div>', 
+				'<div class="info-value">' + headers[0] + '</div>',
+				'<div class="info-name"> Date Created: </div>', 
+				'<div class="info-value">' + headers[2] + '</div>', 
+				'<div class="info-name">Physical Dimensions:</div>', 
+				'<div class="info-value">' + headers[3] + '</div>', 
+				'<div class="info-name">Medium:</div>', 
+				'<div class="info-value">' + headers[4] + '</div>', 
+				'<div class="info-name">Rights:</div>', 
+				'<div class="info-value">' + headers[5] + '</div>', 
 			'</div>',
 		'</div>', 
-		'<div class="image_container-body" align="center">', 
-			'<img id='+imgid+' src=\'images/'+slideNumber+'\.jpg\' align="center">', 
-		'</div>'
+		'<div id='+imgid+' class="image_container-body" align="center" style="background-image: url(\'images/'+slideNumber+'.jpg\');" onclick="zoomImg">', 
+		'</div>',
+		'<div class="object_footer"><b>' + headers[1] + '</b> <i>' + headers[2] + '</i>', 
+		'<br> by ' + headers[0] +'</div>'
 		].join('');
+
 	}
 
+	/**'<div class="image_container-body" align="center">',
+			'<img id='+imgid+' src=\'images/'+slideNumber+'.jpg\' onclick="zoomImg">', 
+		'</div>',**/
 	/**
 	 * Applies layout logic to the contents of all slides in
 	 * the presentation.
@@ -2250,16 +2343,25 @@ function rescale(id, rescale){
 	}
 
 	function resetSlide(index){
+		var id = "img" + index;
 		if ($(".image_container-body").hasClass('shifted')){
 			$(".image_container-body").removeClass('shifted');
+			$(".details-button").removeClass('clicked');
 			$(".object_info").hide();
 			$(".zoom-icon").show();
-			rescale("img" + String(index - 1), "maximize");
+			rescale(id, "maximize");
 			var img = document.getElementById("img" + String(index));
 			imgwidth = img.clientWidth;
 			imgheight = img.clientHeight;
-			console.log(imgwidth);
-		} 
+			document.getElementById(id).style.backgroundSize = "100%";
+		} else if (zoomLevel > 100){
+			//var sizes = getRealSize(index);
+			document.getElementById(id).style.backgroundSize = "100%";
+			document.getElementById(id).style.backgroundPosition= "center";
+			$('.fa-minus-circle').hide();
+			$('.fa-plus-circle').show();
+		}
+		$('.image_container-header').show();
 	}
 
 	/**
@@ -3201,6 +3303,9 @@ function rescale(id, rescale){
 
 	}
 
+	function getSlideNum(){
+		return indexh;
+	}
 	/**
 	 * Returns the number of past slides. This can be used as a global
 	 * flattened index for slides.
@@ -3590,7 +3695,6 @@ function rescale(id, rescale){
 	}
 
 	function navigateLeft() {
-
 		if( isOverview() || availableRoutes().left ) {
 			slide( indexh - 1 );
 		}
@@ -3598,14 +3702,6 @@ function rescale(id, rescale){
 	}
 
 	function navigateRight() {
-
-		/* Reverse for RTL
-		if( config.rtl ) {
-			if( ( isOverview() || availableRoutes().right ) {
-				slide( indexh - 1 );
-			}
-		}*/
-		// Normal navigation
 		if( isOverview() || availableRoutes().right ) {
 			slide( indexh + 1 );
 		}
@@ -3634,7 +3730,6 @@ function rescale(id, rescale){
 	 * 2) Previous horizontal slide
 	 */
 	function navigatePrev() {
-
 		if( availableRoutes().up ) {
 			navigateUp();
 		}
@@ -3661,6 +3756,7 @@ function rescale(id, rescale){
 	 * The reverse of #navigatePrev().
 	 */
 	function navigateNext() {
+		
 		if( availableRoutes().down ) {
 			navigateDown();
 		}
