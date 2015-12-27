@@ -276,8 +276,8 @@ html:-moz-full-screen-ancestor {
   width: 1024px;
   z-index: 50;
   text-align: left;
-  font-size: 12px;
-  bottom:-720px;
+  font-size: 14px;
+  bottom:-710px;
 }
 
 .reveal .slides .object_info{
