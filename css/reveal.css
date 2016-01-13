@@ -271,7 +271,7 @@ html:-moz-full-screen-ancestor {
 
 
 .reveal .slides .details-button {
-  position:absolute;
+  position:fixed;
   top:1%;
   height:20px;
   font-size:14px;
