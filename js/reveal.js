@@ -1888,11 +1888,7 @@ function rescale(id, rescale){
 		var headers = allImageDetails[slideNumber-1].split(";");
 		var imgid = '\'img' + slideNumber +'\'';
 
-		slideElement.innerHTML = [
-			/**'<div class="details-button" type="button" onclick="dropDown('+imgid+')">',
-				'<i class="fa fa-bars"></i> Details', 
-			'</div>', **/
-			
+		slideElement.innerHTML = [			
 			'<div class="object_info">',
 				'<div class="details_header"><b>More Details</b></div>', 
 				'<div class="info-name" style="border-top: none"> Title: </div>', 
