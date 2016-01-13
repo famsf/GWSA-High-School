@@ -1887,7 +1887,7 @@ function rescale(id, rescale){
 		var imgid = '\'img' + slideNumber +'\'';
 
 		slideElement.innerHTML = [
-		'<div class="image_container-header">', 
+		//'<div class="image_container-header">', 
 			'<div class="details-button" type="button" onclick="dropDown('+imgid+')">',
 				'<i class="fa fa-bars"></i> Details', 
 			'</div>', 
@@ -1907,7 +1907,7 @@ function rescale(id, rescale){
 				'<div class="info-name">Rights:</div>', 
 				'<div class="info-value">' + headers[5] + '</div>', 
 			'</div>',
-		'</div>', 
+		//'</div>', 
 		'<div id='+imgid+' class="image_container-body" align="center" style="background-image: url(\'images/'+slideNumber+'.jpg\');" onclick="zoomImg">', 
 		'</div>',
 		'<div class="object_footer"><b>' + headers[1] + '</b> <i>' + headers[2] + '</i>', 
