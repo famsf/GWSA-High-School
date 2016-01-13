@@ -170,6 +170,34 @@ html:-moz-full-screen-ancestor {
   opacity:1;
 }
 
+.reveal .details-button {
+  position:fixed;
+  top:1%;
+  left:1%;
+  height:20px;
+  font-size:14px;
+  cursor: pointer;
+  text-align: left;
+  float:left;
+  background-color:transparent;
+  border: none;
+  border-radius: 0px;
+  padding-right: 1px;
+  padding-left: 1px;
+  z-index: 45;
+  color:#555;
+}
+
+.reveal .details-button:hover {
+  text-shadow: 0 1px 1px rgba(0,0,0,.3);
+  text-decoration: none;
+}
+.reveal .details-button.clicked {
+  font-weight: bold;
+  text-shadow: 0 1px 1px rgba(0,0,0,.3);
+}
+
+
 /*********************************************
  * PROGRESS BAR
  *********************************************/
@@ -231,7 +259,7 @@ html:-moz-full-screen-ancestor {
   }
 
 .reveal .slides {
-	overflow: auto;
+	overflow: visible;
   color:#555;
   position: absolute;
   width: 100%;
@@ -267,32 +295,6 @@ html:-moz-full-screen-ancestor {
   -webkit-transition: -webkit-transform-origin 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985), -webkit-transform 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985), visibility 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985), opacity 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985);
           transition: -ms-transform-origin 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985), transform 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985), visibility 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985), opacity 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985);
           transition: transform-origin 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985), transform 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985), visibility 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985), opacity 800ms cubic-bezier(0.26, 0.86, 0.44, 0.985); 
-}
-
-
-.reveal .slides .details-button {
-  position:fixed;
-  top:1%;
-  height:20px;
-  font-size:14px;
-  cursor: pointer;
-  text-align: left;
-  float:left;
-  background-color:transparent;
-  border: none;
-  border-radius: 0px;
-  padding-right: 1px;
-  padding-left: 1px;
-  z-index: 45;
-}
-
-.reveal .slides .details-button:hover {
-  text-shadow: 0 1px 1px rgba(0,0,0,.3);
-  text-decoration: none;
-}
-.reveal .slides .details-button.clicked {
-  font-weight: bold;
-  text-shadow: 0 1px 1px rgba(0,0,0,.3);
 }
 
 .reveal .slides .object_info{
