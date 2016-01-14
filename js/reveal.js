@@ -7,6 +7,7 @@
  */
 var zoomLevel = 1;
 var last = {id:"", width:0, height:0};
+var WIDTH = Math.min(1024, window.innerWidth), HEIGHT = Math.min(768, window.innerHeight);
 function zoomIn(e){
 	var slideNum = Reveal.getIndices(Reveal.getCurrentSlide()).h;
 	var id = "img" + slideNum;
@@ -54,10 +55,10 @@ function getRealSize(id){
 	var imgW = img.width;
 	var imgH = img.height;
 	var scale;
-	if(Math.abs(1024 - imgW) > Math.abs(768 - imgH)){
-	    return 1024;
+	if(Math.abs(WIDTH - imgW) > Math.abs(HEIGHT - imgH)){
+	    return WIDTH;
 	} else{
-	    scale = 768/imgH;
+	    scale = HEIGHT/imgH;
 	    return imgW*scale;     
 	}
 }
@@ -185,7 +186,6 @@ function dropDown(){
 	$(".controls").slideToggle();
 	$(".object_info").slideToggle(650);
 	$('.details-button').toggleClass('clicked');
-	console.log(id);
 }
 
 function rescale(id, rescale){
@@ -193,18 +193,19 @@ function rescale(id, rescale){
 	var amt = last.width, scale = 1;
 	if (rescale == "minimize"){
 		if (id == "img1"){
-			amt = 903;
-		} else if (last.width > 744 && id != "img5"){
-			amt = 735;
+			amt = WIDTH*.75;
+		} else if (last.width > WIDTH - 1 && id != "img5"){
+			amt = WIDTH*.7;
 		}
 		scale = amt/last.width;
 		$(last.id).animate({
 			"background-size": scale*100 + "%",
 		}, 600);
+		console.log(scale);
 		if (id == "img1"){
-			document.getElementById(id).style.backgroundPositionX = "205px";
+			document.getElementById(id).style.backgroundPositionX = (WIDTH*.25).toString() + "px";
 		} else if (id == "img5"){
-			document.getElementById(id).style.backgroundPositionX = "68px";
+			document.getElementById(id).style.backgroundPositionX = (WIDTH/1700*280).toString() + "px";
 		} else {
 			document.getElementById(id).style.backgroundPosition = "center right";
 		}
@@ -246,8 +247,8 @@ function rescale(id, rescale){
 
 			// The "normal" size of the presentation, aspect ratio will be preserved
 			// when the presentation is scaled to fit different resolutions
-			width: 1024,
-			height: 768,
+			width: Math.min(1024, window.innerWidth),
+			height: Math.min(768, window.innerHeight),
 
 			// Factor of the display size that should remain empty around the content
 			margin: 0,
@@ -2361,14 +2362,14 @@ function rescale(id, rescale){
 			imgwidth = img.clientWidth;
 			imgheight = img.clientHeight;
 			document.getElementById(id).style.backgroundSize = "100%";
-		} else if (zoomLevel > 100){
-			//var sizes = getRealSize(index);
+		} else if (zoomLevel > 1){
 			document.getElementById(id).style.backgroundSize = "100%";
 			document.getElementById(id).style.backgroundPosition= "center";
 			$('.fa-minus-circle').hide();
 			$('.fa-plus-circle').show();
 		}
 		$('.image_container-header').show();
+		$('.object_footer').show();
 	}
 
 	/**
