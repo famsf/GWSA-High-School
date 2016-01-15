@@ -5,9 +5,10 @@
  *
  * Copyright (C) 2015 Hakim El Hattab, http://hakim.se
  */
+
 var zoomLevel = 1;
-var last = {id:"", width:0, height:0};
-var WIDTH = Math.min(1024, window.innerWidth), HEIGHT = Math.min(768, window.innerHeight);
+var last = {id:"", scale:0, height:0, width:0};
+var WIDTH = Math.min(1024, window.innerWidth), HEIGHT = Math.min(768, window.innerHeight) - 50;
 function zoomIn(e){
 	var slideNum = Reveal.getIndices(Reveal.getCurrentSlide()).h;
 	var id = "img" + slideNum;
@@ -19,13 +20,14 @@ function zoomIn(e){
 		"background-size": zoomLevel*100 + "%"
 	}, 900);
 		
-	if (zoomLevel == 2){
-		$('.fa-plus-circle').hide();
+	if (zoomLevel > 2){
+		$('.fa-search-plus').hide();
 	}
-	$('.fa-minus-circle').show();
-	$('.image_container-header').hide();
+	$('.fa-search-minus').show();
 	$('.object_footer').hide();
-	
+	if (!$(".image_container-body").hasClass('shifted')){
+		$('.details-button').hide();
+	}
 }
 
 function zoomOut(e){
@@ -37,16 +39,16 @@ function zoomOut(e){
 		$(last.id).animate({
 			"background-size": "100%"
 		}, 900);
-		document.getElementById(id).style.backgroundPosition = "center";
+		
 		$('.object_footer').show();
-		$('.fa-minus-circle').hide();
-		$('.image_container-header').show();
+		$('.fa-search-minus').hide();
+		$('.details-button').show();
 	} else {
 		$(last.id).animate({
 			"background-size": zoomLevel*100 + "%"
 		}, 900);
 	}
-	$('.fa-plus-circle').show();
+	$('.fa-search-plus').show();
 }
 
 function getRealSize(id){
@@ -54,11 +56,15 @@ function getRealSize(id){
 	img.src = "images/"+id + ".jpg";
 	var imgW = img.width;
 	var imgH = img.height;
+
+	last.height = imgH*WIDTH/imgW;
 	var scale;
 	if(Math.abs(WIDTH - imgW) > Math.abs(HEIGHT - imgH)){
+		last.scale = 1;
 	    return WIDTH;
 	} else{
 	    scale = HEIGHT/imgH;
+	    last.scale = scale;
 	    return imgW*scale;     
 	}
 }
@@ -108,21 +114,23 @@ function zoomImg(e){
 		}, 900);	
 	} else {
 		$(last.id).animate({
-			"background-size": "100%"
+			"background-size": "100%",
+			"background-position": "50% 50%"
 		}, 900);	
-		document.getElementById(id).style.backgroundPosition = "50% 50%";
 		zoomLevel = 1;
 	}
 	if (zoomLevel == 1){
-		$('.fa-plus-circle').show();
-		$('.fa-minus-circle').hide();
-		$('.image_container-header').show();
+		$('.fa-search-plus').show();
+		$('.fa-search-minus').hide();
+		$('.details-button').show();
 	} else {
-		$('.fa-minus-circle').show();
-		$('.image_container-header').hide();
+		$('.fa-search-minus').show();
+		if (!$(".image_container-body").hasClass('shifted')){
+			$('.details-button').hide();
+		}
 	}
 	if (zoomLevel == 2){
-		$('.fa-plus-circle').hide();
+		$('.fa-search-plus').hide();
 	}
 	Reveal.addEventListener( 'overviewshown', function() { isEnabled = false; } );
 	Reveal.addEventListener( 'overviewhidden', function() { isEnabled = true; } );
@@ -155,7 +163,6 @@ function fixPageXY(e) {
 	}
 }
 
-
 function getPosition(element) {
     var xPosition = 0;
     var yPosition = 0;
@@ -182,20 +189,20 @@ function dropDown(){
 		rescale(id, "minimize");
 	}
 	$('.object_footer').toggle();
-	$(".zoom-icon").slideToggle();
-	$(".controls").slideToggle();
+	
 	$(".object_info").slideToggle(650);
 	$('.details-button').toggleClass('clicked');
 }
 
 function rescale(id, rescale){
 	resetImgContain(id);
+	console.log(last.id);
 	var amt = last.width, scale = 1;
 	if (rescale == "minimize"){
 		if (id == "img1"){
-			amt = WIDTH*.75;
-		} else if (last.width > WIDTH - 1 && id != "img5"){
-			amt = WIDTH*.7;
+			amt = WIDTH*.95;
+		} else if (last.width > WIDTH - 280 && id != "img5"){
+			amt = WIDTH-280;
 		}
 		scale = amt/last.width;
 		$(last.id).animate({
@@ -203,7 +210,7 @@ function rescale(id, rescale){
 		}, 600);
 		console.log(scale);
 		if (id == "img1"){
-			document.getElementById(id).style.backgroundPositionX = (WIDTH*.25).toString() + "px";
+			document.getElementById(id).style.backgroundPositionX = (WIDTH*.17).toString() + "px";
 		} else if (id == "img5"){
 			document.getElementById(id).style.backgroundPositionX = (WIDTH/1700*280).toString() + "px";
 		} else {
@@ -211,9 +218,10 @@ function rescale(id, rescale){
 		}
 	} else {
 		$(last.id).animate({
-			"background-size": "100%"
+			"background-size": "100%",
+			backgroundPositionX: "50%"
 		}, 600);
-		document.getElementById(id).style.backgroundPosition = "center";
+		
 	}	
 }
 
@@ -517,13 +525,18 @@ function rescale(id, rescale){
 
 		// Loads the dependencies and continues to #start() once done
 		load();
-
+		if (window.innerHeight > 768){
+			$('.image_container-body').height('735px');
+		}
+		console.log(window.innerHeight + "x" + window.innerWidth);
 		var i;
-		var images = document.getElementsByClassName('image_container-body');
 		for (i = 1; i < totalSlides(); i++){
 			var imgid = "img" + i;
 			document.getElementById(imgid).addEventListener("click", zoomImg);
 			document.getElementById(imgid).addEventListener("onmousedown", dragImg);
+			if (config.height < 768){
+				document.getElementById('object_info'+i).style.top='20px';
+			}
 		}
 		document.getElementById("zoomin").addEventListener("click", zoomIn);
 		document.getElementById("zoomout").addEventListener("click", zoomOut);
@@ -1890,7 +1903,7 @@ function rescale(id, rescale){
 		var imgid = '\'img' + slideNumber +'\'';
 
 		slideElement.innerHTML = [			
-			'<div class="object_info">',
+			'<div id=\'object_info'+slideNumber+'\' class="object_info">',
 				'<div class="details_header"><b>More Details</b></div>', 
 				'<div class="info-name" style="border-top: none"> Title: </div>', 
 				'<div class="info-value">' + headers[1] + '</div>',
@@ -1906,7 +1919,7 @@ function rescale(id, rescale){
 				'<div class="info-value">' + headers[5] + '</div>', 
 			'</div>',
 		
-		'<div id='+imgid+' class="image_container-body" align="center" style="background-image: url(\'images/'+slideNumber+'.jpg\');" onclick="zoomImg">', 
+		'<div id='+imgid+' class="image_container-body" style="background-image: url(\'images/'+slideNumber+'.jpg\');" onclick="zoomImg">', 
 		'</div>',
 		'<div class="object_footer"><b>' + headers[1] + '</b> <i>' + headers[2] + '</i>', 
 		'<br> by ' + headers[0] +'</div>'
@@ -2351,7 +2364,13 @@ function rescale(id, rescale){
 	}
 
 	function resetSlide(index){
+		if (index == 2){
+			$('.details-button').hide();
+			$('.controls').hide();
+			return;
+		}
 		var id = "img" + index;
+		var height = Math.min(768, window.innerHeight);
 		if ($(".image_container-body").hasClass('shifted')){
 			$(".image_container-body").removeClass('shifted');
 			$(".details-button").removeClass('clicked');
@@ -2359,17 +2378,18 @@ function rescale(id, rescale){
 			$(".zoom-icon").show();
 			rescale(id, "maximize");
 			var img = document.getElementById("img" + String(index));
+			document.getElementById(id).style.backgroundSize = "100%";
 			imgwidth = img.clientWidth;
 			imgheight = img.clientHeight;
+		} if (zoomLevel > 1){
+			document.getElementById(id).style.backgroundPosition= "50% 50%";
 			document.getElementById(id).style.backgroundSize = "100%";
-		} else if (zoomLevel > 1){
-			document.getElementById(id).style.backgroundSize = "100%";
-			document.getElementById(id).style.backgroundPosition= "center";
-			$('.fa-minus-circle').hide();
-			$('.fa-plus-circle').show();
+			$('.fa-search-plus').show();
 		}
-		$('.image_container-header').show();
+		$('.fa-search-minus').hide();
+		$('.details-button').show();
 		$('.object_footer').show();
+		$('.controls').show();
 	}
 
 	/**
@@ -2621,9 +2641,13 @@ function rescale(id, rescale){
 			// Enforce max and minimum index bounds
 			index = Math.max( Math.min( index, slidesLength - 1 ), 0 );
 			if (index == 0){
+				$('.controls').hide();
 				$('.zoom-icon').hide();
+				$('.details-button').hide();
 			} else {
+				$('.controls').show();
 				$('.zoom-icon').show();
+				$('.details-button').show();
 			}
 			for( var i = 0; i < slidesLength; i++ ) {
 				var element = slides[i];
@@ -3764,7 +3788,6 @@ function rescale(id, rescale){
 	 * The reverse of #navigatePrev().
 	 */
 	function navigateNext() {
-		
 		if( availableRoutes().down ) {
 			navigateDown();
 		}
