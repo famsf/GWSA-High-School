@@ -536,6 +536,10 @@ function rescale(id, rescale){
 			document.getElementById(imgid).addEventListener("onmousedown", dragImg);
 			if (config.height < 768){
 				document.getElementById('object_info'+i).style.top='20px';
+				
+			} else {
+				document.getElementById('footer'+i).style.color="#555";
+				document.getElementById('footer'+i).style.textShadow="none";
 			}
 		}
 		document.getElementById("zoomin").addEventListener("click", zoomIn);
@@ -1921,7 +1925,7 @@ function rescale(id, rescale){
 		
 		'<div id='+imgid+' class="image_container-body" style="background-image: url(\'images/'+slideNumber+'.jpg\');" onclick="zoomImg">', 
 		'</div>',
-		'<div class="object_footer"><b>' + headers[1] + '</b> <i>' + headers[2] + '</i>', 
+		'<div id=\'footer'+slideNumber+'\' class="object_footer" style="text-align:left"><b>' + headers[1] + '</b> <i>' + headers[2] + '</i>', 
 		'<br> by ' + headers[0] +'</div>'
 		].join('');
 
