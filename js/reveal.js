@@ -37,9 +37,6 @@ function zoomAmount(id, index){
 	}
 	if (index == 4){
 		return "98%";
-	} else if (index == 1){
-		console.log(HEIGHT + " " + index);
-		return "95%";
 	} else if (index == 9 || index == 10){
 		return "95%";
 	} else if (index == 8){
