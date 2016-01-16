@@ -179,7 +179,7 @@ html:-moz-full-screen-ancestor {
 
 .reveal .details-button {
   position:fixed;
-  top:1.5%;
+  top:-1.8%;
   height:20px;
   font-size:14px;
   cursor: pointer;

@@ -31,14 +31,34 @@ function zoomIn(e){
 	}
 }
 
+function zoomAmount(id, index){
+	if (index == 4 || index == 1 || index == 8|| index == 9 || index == 10){
+		document.getElementById(id).style.backgroundPositionY="0px";
+	}
+	if (index == 4){
+		return "98%";
+	} else if (index == 1){
+		console.log(HEIGHT + " " + index);
+		return "95%";
+	} else if (index == 9 || index == 10){
+		return "95%";
+	} else if (index == 8){
+		console.log("here");
+		return "87%";
+	} else {
+		return "100%";
+	}
+}
+
 function zoomOut(e){
 	var i = Reveal.getIndices(Reveal.getCurrentSlide()).h;
 	var id = "img" + i;
 	var sizes = resetImgContain(id);
 	zoomLevel -= .25;
+	var amount = zoomAmount(id, i);
 	if (zoomLevel == 1){
 		$(last.id).animate({
-			"background-size": "100%"
+			"background-size": amount
 		}, 900);
 		
 		$('.object_footer').show();
@@ -498,7 +518,6 @@ function rescale(id, rescale){
 	function initialize( options ) {
 
 		checkCapabilities();
-
 		if( !features.transforms2d && !features.transforms3d ) {
 			document.body.setAttribute( 'class', 'no-transforms' );
 
@@ -553,6 +572,7 @@ function rescale(id, rescale){
 		// Loads the dependencies and continues to #start() once done
 		load();
 		console.log(window.innerHeight + "x" + window.innerWidth);
+		
 		var i;
 		for (i = 1; i < totalSlides(); i++){
 			var imgid = "img" + i;
@@ -560,8 +580,9 @@ function rescale(id, rescale){
 			document.getElementById(imgid).addEventListener("onmousedown", dragImg);
 			if (config.height < 768){
 				document.getElementById('object_info'+i).style.top='20px';
-				
+				document.getElementById('details').style.top='0%';
 			} else {
+				
 				document.getElementById('footer'+i).style.color="#555";
 				document.getElementById('footer'+i).style.textShadow="none";
 			}
@@ -2399,6 +2420,8 @@ function rescale(id, rescale){
 		}
 		var id = "img" + index;
 		var height = Math.min(768, window.innerHeight);
+		var amount = zoomAmount(id, index);
+		document.getElementById(id).style.backgroundSize = amount;
 		if ($(".image_container-body").hasClass('shifted')){
 			$(".image_container-body").removeClass('shifted');
 			$(".details-button").removeClass('clicked');
@@ -2406,19 +2429,18 @@ function rescale(id, rescale){
 			$(".zoom-icon").show();
 			rescale(id, "maximize");
 			var img = document.getElementById("img" + String(index));
-			if (config.height < 768){
-				document.getElementById(id).style.backgroundSize = "contain";
-			} else {
-				document.getElementById(id).style.backgroundSize = "100%";
-			}
-		} if (zoomLevel > 1){
+			document.getElementById(id).style.backgroundSize = amount;
+		} else if (zoomLevel > 1){
 			document.getElementById(id).style.backgroundPosition= "50% 50%";
 			if (config.height < 768){
-				document.getElementById(id).style.backgroundSize = "contain";
+				document.getElementById(id).style.backgroundSize = amount;
 			} else {
 				document.getElementById(id).style.backgroundSize = "100%";
 			}
 			$('.fa-search-plus').show();
+		} else {
+			console.log(amount);
+			document.getElementById(id).style.backgroundSize = amount;
 		}
 		$('.fa-search-minus').hide();
 		$('.details-button').show();
