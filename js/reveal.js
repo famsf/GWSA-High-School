@@ -32,18 +32,21 @@ function zoomIn(e){
 }
 
 function zoomAmount(id, index){
-	if (index == 4 || index == 1 || index == 8|| index == 9 || index == 10){
-		document.getElementById(id).style.backgroundPositionY="0px";
-	}
-	if (index == 4){
-		return "98%";
+	console.log("index " + index);
+	if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+ 		return ["100%", "50%"];
+	} else if (index == 1){
+		return ["94%", "14px"];
+	} else if (index == 12){
+		return ["97%", "28px"];
+	} else if (index == 4){
+		return ["90%", "28px"];
 	} else if (index == 9 || index == 10){
-		return "95%";
+		return ["87%", "28px"];
 	} else if (index == 8){
-		console.log("here");
-		return "87%";
+		return ["80%", "27%"];
 	} else {
-		return "100%";
+		return ["100%", '50%'];
 	}
 }
 
@@ -52,10 +55,12 @@ function zoomOut(e){
 	var id = "img" + i;
 	var sizes = resetImgContain(id);
 	zoomLevel -= .25;
-	var amount = zoomAmount(id, i);
+	var amount = zoomAmount(i, id);
 	if (zoomLevel == 1){
 		$(last.id).animate({
-			"background-size": amount
+			"background-size": amount[0],
+			"backgroundPositionX": "50%",
+			"backgroundPositionY":amount[1]
 		}, 900);
 		
 		$('.object_footer').show();
@@ -76,10 +81,12 @@ function resetZoom(e){
 	} else {
 		var i = Reveal.getIndices(Reveal.getCurrentSlide()).h;
 		var id = "img" + i;
+
+		var amount = zoomAmount(id, i);
 		$(last.id).animate({
-			"background-size": "100%",
+			"background-size": amount[0],
 			"backgroundPositionX": "50%",
-			"backgroundPositionY":"50%"
+			"backgroundPositionY":amount[1]
 		}, 900);
 	}
 	
@@ -157,9 +164,11 @@ function zoomImg(e){
 		}, 900);	
 	} else {
 		$('.fa-times-circle-o').show();
+		var amount = zoomAmount(id, i);
 		$(last.id).animate({
-			"background-size": "100%",
-			"background-position": "50% 50%"
+			"background-size": amount[0],
+			"backgroundPositionX": "50%",
+			"backgroundPositionY":amount[1]
 		}, 900);	
 		zoomLevel = 1;
 	}
@@ -227,7 +236,10 @@ function dropDown(){
 		$('.fa-times-circle-o').hide();
 	} else {
 		if (zoomLevel > 1){
-			document.getElementById(id).style.backgroundSize = "100%";
+			var amount = zoomAmount(id, i);
+			$(last.id).animate({
+				"background-size": amount[0]
+			}, 900);
 			zoomLevel = 1;
 		}
 		$(".image_container-body").addClass('shifted');
@@ -261,9 +273,11 @@ function rescale(id, rescale){
 			document.getElementById(id).style.backgroundPosition = "center right";
 		}
 	} else {
+		var amount = zoomAmount(id, id[3]);
 		$(last.id).animate({
-			"background-size": "100%",
-			backgroundPositionX: "50%"
+			"background-size": amount[0],
+			"backgroundPositionX": "50%",
+			"backgroundPositionY":amount[1]
 		}, 600);
 		
 	}	
@@ -413,14 +427,14 @@ function rescale(id, rescale){
 		},
 
 		//Text file that holds all of the image details
-		allImageDetails = ["Diego Rivera (1886–1957); Two Women and a Child;1926;Oil on canvas;29 3/8 x 31 5/8 in. (74.6 x 80.3 cm);FAMSF, Gift of Albert M. Bender, 1926.122",
+		allImageDetails = ["Diego Rivera (1886–1957); Two Women and a Child;1926;Oil on canvas;29 3/8 x 31 5/8 in. (74.6 x 80.3 cm);FAMSF, Gift of Albert M. Bender, 1926.122. © 2016 Banco de México Diego Rivera Frida Kahlo Museums Trust, Mexico, D.F. / Artists Rights Society (ARS), New York",
 		 'Albert Bierstadt (1830–1902);California Spring;1875;Oil on canvas;54 1/4 x 84 1/4 in. (137.8 x 214 cm);FAMSF, Presented to the City and County of San Francisco by Gordon Blanding, 1941.6', 
 		 'Elihu Vedder (1836–1923);The Sphinx of the Seashore;1879;Oil on canvas;16 x 27 7/8 in. (40.6 x 70.8 cm);FAMSF, Gift of Mr. and Mrs. John D. Rockefeller 3rd, 1979.7.102', 
 		 'Horace Pippin (1888–1946);The Trial of John Brown;1942;Oil on canvas;16 1/2 x 20 1/8 in. (41.9 x 51.1 cm);FAMSF, Gift of Mr. and Mrs. John D. Rockefeller 3rd, 1979.7.82', 
 		 'Zhan Wang (b. 1962);Artificial Rock;2005; Stainless steel;177 1/8 x 78 3/4 x 94 1/2 in. (449.9 x 200 x 240 cm);FAMSF, Foundation purchase, a gift from Dagmar Dolby in celebration of Ray Dolby\'s 1965 founding of Dolby Laboratories, 2005.61',
 		 'Wayne Thiebaud (b. 1920); Diagonal Freeway;1993;Acrylic on canvas;36 x 60 in. (91.4 x 152.4 cm);Art C Wayne Thiebaud/Licensed by VAGA, New York, NY', 
-		 'Grant Wood (1891–1942);Dinner for Threshers;1934;Oil on hardboard panel;20 x 80 in. (50.8 x 203.2 cm);Art C Figge Art Museum, successors to the Estate of Nan Wood Graham/Licensed by VAGA, New York, NY', 
-		 'John Langley Howard (1902–1999);Embarcadero and Clay Street;1935; Oil on canvas;35 7/8 x 43 1/2 in. (91.1 x 110.5 cm);FAMSF Museum purchase, Dr. Leland A. Barber and Gladys K. Barber Fund, 2002.96',
+		 'Grant Wood (1891–1942);Dinner for Threshers;1934;Oil on hardboard panel;20 x 80 in. (50.8 x 203.2 cm);© Art C Figge Art Museum, successors to the Estate of Nan Wood Graham/Licensed by VAGA, New York, NY', 
+		 'John Langley Howard (1902–1999);Embarcadero and Clay Street;1935; Oil on canvas;35 7/8 x 43 1/2 in. (91.1 x 110.5 cm);FAMSF Museum purchase, Dr. Leland A. Barber and Gladys K. Barber Fund, 2002.96. © 2016 John Howard / Artists Rights Society (ARS), New York',
 		 'Stuart Davis (1892–1964);Night Life;1962;Oil on canvas;24 x 32 in. (61 x 81.3 cm);Art C Estate of Stuart Davis/Licensed by VAGA, New York, NY', 
 		 'Andy Goldsworthy (b. 1956);Drawn Stone;2005;Appleton Greenmore sandstone;1 5/8 x 124 1/8 x 179 3/4 ft. (.48 x 37.82 x 54.78 m);FAMSF, Museum purchase, gift of Lonna and Marshall Wais, 2004.5', 
 		 'Kiki Smith (b. 1954);Near;2005;Cast aluminum, copper leaf, and hand-blown glass;13 1/4 x 41 x 24 ft. (3.96 x 12.49 x 7.32 m);FAMSF, Museum purchase, gift of Dorothy and George Saxe and Friends of New Art, 2004.94', 
@@ -1942,6 +1956,10 @@ function rescale(id, rescale){
 		return numberOfSlides;
 	}
 
+	function isMobile(){
+		return isMobileDevice;
+	}
+
 	function loadSlide(slideNumber, slideElement) {
 		slideElement.setAttribute('id', slideNumber);
 		
@@ -2410,15 +2428,16 @@ function rescale(id, rescale){
 	}
 
 	function resetSlide(index){
-		if (index == 2){
-			$('.details-button').hide();
-			$('.controls').hide();
+		if (index == 0){
 			return;
 		}
+		
 		var id = "img" + index;
-		var height = Math.min(768, window.innerHeight);
 		var amount = zoomAmount(id, index);
 		document.getElementById(id).style.backgroundSize = amount;
+		if (isMobileDevice){
+			amount = ["100%", "50%"];
+		}
 		if ($(".image_container-body").hasClass('shifted')){
 			$(".image_container-body").removeClass('shifted');
 			$(".details-button").removeClass('clicked');
@@ -2426,19 +2445,18 @@ function rescale(id, rescale){
 			$(".zoom-icon").show();
 			rescale(id, "maximize");
 			var img = document.getElementById("img" + String(index));
-			document.getElementById(id).style.backgroundSize = amount;
+			document.getElementById(id).style.backgroundSize = amount[0];
 		} else if (zoomLevel > 1){
-			document.getElementById(id).style.backgroundPosition= "50% 50%";
-			if (config.height < 768){
-				document.getElementById(id).style.backgroundSize = amount;
-			} else {
-				document.getElementById(id).style.backgroundSize = "100%";
-			}
+			document.getElementById(id).style.backgroundSize = amount[0];
+			
 			$('.fa-search-plus').show();
 		} else {
 			console.log(amount);
-			document.getElementById(id).style.backgroundSize = amount;
+			document.getElementById(id).style.backgroundSize = amount[0];
 		}
+		document.getElementById(id).style.backgroundPositionX= "50%";
+		document.getElementById(id).style.backgroundPositionY = amount[1];
+			
 		$('.fa-search-minus').hide();
 		$('.details-button').show();
 		$('.object_footer').show();
