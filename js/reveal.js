@@ -288,6 +288,11 @@ function rescale(id, rescale){
 	}	
 }
 
+function begin(){
+	Reveal.slide(0, 0);
+}
+
+
 (function( root, factory ) {
 	if( typeof define === 'function' && define.amd ) {
 		// AMD. Register as an anonymous module.
@@ -443,10 +448,10 @@ function rescale(id, rescale){
 		 'Stuart Davis (1892–1964);Night Life;1962;Oil on canvas;24 x 32 in. (61 x 81.3 cm);FAMSF, gift of Mrs. Paul L. Wattis and bequest of the Phyllis C. Wattis 1991 Trust from Paul L. Wattis, Jr. and Carol W. Casey. Art © Estate of Stuart Davis/Licensed by VAGA, New York, NY', 
 		 'Andy Goldsworthy (b. 1956);Drawn Stone;2005;Appleton Greenmore sandstone;1 5/8 x 124 1/8 x 179 3/4 ft. (.48 x 37.82 x 54.78 m);FAMSF, gift of Lonna and Marshall Wais, 2004.5', 
 		 'Kiki Smith (b. 1954);Near;2005;Cast aluminum, copper leaf, and hand-blown glass;13 1/4 x 41 x 24 ft. (3.96 x 12.49 x 7.32 m);FAMSF, gift of Dorothy and George Saxe and Friends of New Art, 2004.94', 
-		 'El Anatsui (b. 1944);Hovor II;2004;Woven aluminum bottle caps, copper wire;120 x 144 in.(304.8 x 365.8 cm);FAMSF, museum purchase, James J. and Eileen D. Ludwig Endowment Fund, Virginia Patterson Fund, Charles Frankel Philanthropic Fund, and various tribute funds,2004.109'],
+		 'El Anatsui (b. 1944);Hovor II;2004;Woven aluminum bottle caps, copper wire;120 x 144 in.(304.8 x 365.8 cm);FAMSF, museum purchase, James J. and Eileen D. Ludwig Endowment Fund, Virginia Patterson Fund, Charles Frankel Philanthropic Fund, and various tribute funds, 2004.109'],
 		
 		// Total number of slides
-		numberOfSlides = 13, 
+		numberOfSlides = 14, 
 
 		// Flags if reveal.js is loaded (has dispatched the 'ready' event)
 		loaded = false,
@@ -589,7 +594,7 @@ function rescale(id, rescale){
 		load();
 		
 		var i;
-		for (i = 1; i < totalSlides(); i++){
+		for (i = 1; i < totalSlides() - 1; i++){
 			var imgid = "img" + i;
 			document.getElementById(imgid).addEventListener("click", zoomImg);
 			document.getElementById(imgid).addEventListener("onmousedown", dragImg);
@@ -705,7 +710,7 @@ function rescale(id, rescale){
 	}
 
 	function setupSlides(){
-		for( var i = 1, len = numberOfSlides; i < len; i++ ) {
+		for( var i = 1; i < numberOfSlides; i++ ) {
 			var slide = document.createElement('section');
 			loadSlide(i, slide);
 			dom.slides.appendChild(slide);
@@ -1971,33 +1976,47 @@ function rescale(id, rescale){
 	}
 
 	function loadSlide(slideNumber, slideElement) {
-		slideElement.setAttribute('id', slideNumber);
-		
-		var headers = allImageDetails[slideNumber-1].split(";");
-		var imgid = '\'img' + slideNumber +'\'';
+		if (slideNumber == numberOfSlides - 1){
+			slideElement.setAttribute('data-background', "images/13.jpg");
+			slideElement.innerHTML = [
+			'<div class="restart" onclick="begin()">',
+				'<h3><span class="fa-stack fa-lg" style="font-size:30px">',
+					'<i class="fa fa-circle-thin fa-stack-2x"></i>',
+					'<i class="fa fa-repeat fa-stack-1x"></i>',
+			    '</span>',
+			    '<br>restart',
+			'</h3></div>'
+			].join('');
+		} else {
+			slideElement.setAttribute('id', slideNumber);
+			var headers = allImageDetails[slideNumber-1].split(";");
+			var imgid = '\'img' + slideNumber +'\'';
 
-		slideElement.innerHTML = [			
-			'<div id=\'object_info'+slideNumber+'\' class="object_info">',
-				'<div class="details_header"><b>More Details</b></div>', 
-				'<div class="info-name" style="border-top: none"> Title: </div>', 
-				'<div class="info-value"><em>' + headers[1] + '</em></div>',
-				'<div class="info-name"> Artist: </div>', 
-				'<div class="info-value">' + headers[0] + '</div>',
-				'<div class="info-name"> Date Created: </div>', 
-				'<div class="info-value">' + headers[2] + '</div>', 
-				'<div class="info-name">Physical Dimensions:</div>', 
-				'<div class="info-value">' + headers[4] + '</div>', 
-				'<div class="info-name">Medium:</div>', 
-				'<div class="info-value">' + headers[3] + '</div>', 
-				'<div class="info-name">Rights:</div>', 
-				'<div class="info-value">' + headers[5] + '</div>', 
-			'</div>',
+			slideElement.innerHTML = [			
+				'<div id=\'object_info'+slideNumber+'\' class="object_info">',
+					'<div class="details_header"><b>More Details</b></div>', 
+					'<div class="info-name" style="border-top: none"> Title: </div>', 
+					'<div class="info-value"><em>' + headers[1] + '</em></div>',
+					'<div class="info-name"> Artist: </div>', 
+					'<div class="info-value">' + headers[0] + '</div>',
+					'<div class="info-name"> Date Created: </div>', 
+					'<div class="info-value">' + headers[2] + '</div>', 
+					'<div class="info-name">Physical Dimensions:</div>', 
+					'<div class="info-value">' + headers[4] + '</div>', 
+					'<div class="info-name">Medium:</div>', 
+					'<div class="info-value">' + headers[3] + '</div>', 
+					'<div class="info-name">Rights:</div>', 
+					'<div class="info-value">' + headers[5] + '</div>', 
+				'</div>',
+			
+				'<div id='+imgid+' class="image_container-body" style="background-image: url(\'images/'+slideNumber+'.jpg\');" onclick="zoomImg">', 
+				'</div>',
+				'<div id=\'footer'+slideNumber+'\' class="object_footer" style="text-align:left"><b>' + headers[1] + '</b> <i>' + headers[2] + '</i>', 
+				'<br> by ' + headers[0] +'</div>'
+			].join('');
+		}
+
 		
-		'<div id='+imgid+' class="image_container-body" style="background-image: url(\'images/'+slideNumber+'.jpg\');" onclick="zoomImg">', 
-		'</div>',
-		'<div id=\'footer'+slideNumber+'\' class="object_footer" style="text-align:left"><b>' + headers[1] + '</b> <i>' + headers[2] + '</i>', 
-		'<br> by ' + headers[0] +'</div>'
-		].join('');
 
 	}
 
@@ -2438,7 +2457,10 @@ function rescale(id, rescale){
 	}
 
 	function resetSlide(index){
-		if (index == 0){
+		if (index == 0 || index == 13){
+			$('.details-button').hide();
+			$('.object_footer').hide();
+			$('.fa-search-plus').hide();
 			return;
 		}
 		
@@ -2454,7 +2476,6 @@ function rescale(id, rescale){
 			$(".object_info").hide();
 			$(".zoom-icon").show();
 			rescale(id, "maximize");
-			//var img = document.getElementById("img" + String(index));
 			document.getElementById(id).style.backgroundSize = amount[0];
 			
 		} else if (zoomLevel > 1){
@@ -2720,8 +2741,10 @@ function rescale(id, rescale){
 
 			// Enforce max and minimum index bounds
 			index = Math.max( Math.min( index, slidesLength - 1 ), 0 );
-			if (index == 0){
-				$('.controls').hide();
+			if (index == 0 || index == numberOfSlides - 1){
+				if (index == 0){
+					$('.controls').hide();
+				}
 				$('.zoom-icon').hide();
 				$('.details-button').hide();
 			} else {

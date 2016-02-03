@@ -180,6 +180,7 @@ html:-moz-full-screen-ancestor {
 
 .reveal .details-button {
   position:fixed;
+  display:block;
   top:2%;
   height:20px;
   font-size:14px;
@@ -207,7 +208,7 @@ html:-moz-full-screen-ancestor {
 
 .reveal .object_info{
 	position:fixed;
-  top:3%;
+  top:4%;
   z-index: 45;
   text-align: left;
   width:275px;
@@ -377,8 +378,12 @@ html:-moz-full-screen-ancestor {
   border-color: black;
 }
 
-.reveal .slides .title{
-  vertical-align: middle;
+.reveal .slides .restart{
+  position: relative; 
+  margin-left: auto; 
+  margin-right: auto; 
+  top: 50%; 
+  transform: translateY(-50%);
 }
 
 /* Global transition speed settings */
