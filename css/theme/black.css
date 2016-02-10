@@ -39,6 +39,7 @@ body {
 .reveal h4,
 .reveal h5,
 .reveal h6 {
+  text-align: center;
   margin: 0 0 20px 0;
   color: #fff;
   font-family: Arial,sans-serif;
@@ -59,6 +60,10 @@ body {
 
 .reveal h4 {
   font-size: 1em; }
+
+.reveal h6 {
+  color:#555;
+}
 
 /*********************************************
  * OTHER

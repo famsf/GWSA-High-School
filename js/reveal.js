@@ -35,17 +35,17 @@ function zoomAmount(id, index){
 	if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
  		return ["100%", "50%"];
 	} else if (index == 1){
-		return ["95%", "28px"];
-	} else if (index == 4){
 		return ["93%", "28px"];
+	} else if (index == 4){
+		return ["91%", "28px"];
 	} else if (index == 9){
-		return ["90%", "30px"];
+		return ["88%", "30px"];
 	} else if (index == 10){
-		return ["89%", "30px"];
+		return ["87%", "30px"];
 	} else if (index == 8){
-		return ["82%", "28px"];
+		return ["80%", "28px"];
 	} else if (index == 12){
-		return ["97%", "50%"];
+		return ["95%", "50%"];
 	} else {
 		return ["100%", '50%'];
 	}
