@@ -34,7 +34,7 @@ function zoomIn(e){
 }
 
 function zoomAmount(index){
-	if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+	if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
  		return "100%";
 	} else if (index == 1){
 		return "95%"
@@ -80,7 +80,6 @@ function resetZoom(e){
 	var id = "img" + i;
 		
 	if ($(".image_container-body").hasClass('shifted')){
-		console.log("reset with dropdown");
 		dropDown();
 	} else {
 		resetImgContain(id);
@@ -91,7 +90,6 @@ function resetZoom(e){
 			width:"100%",
 			height:amount
 		}, 900);
-		console.log("reset" + last.id + ": " + amount);
 	}
 	$('.object_footer').show();
 	$('.fa-search-minus').hide();
@@ -138,13 +136,12 @@ function zoomImg(e){
    	
 	resetImgContain(id);
 	zoomLevel += .25;
-	console.log(id)
 	if (zoomLevel < 2){
 		$('.fa-times-circle-o').show();
 		var bounds = e.target.getBoundingClientRect();
 		$(last.id).animate({
-			left: (e.pageX - window.innerWidth)*(zoomLevel - 1),
-			top: (e.pageY - window.innerHeight)*(zoomLevel - 1),
+			left: (window.innerWidth - e.pageX*zoomLevel),
+			top: (window.innerHeight - e.pageY*zoomLevel),
 			width: zoomLevel*100+"%",
 			height: zoomLevel*100+"%"
 		}, 900);	
